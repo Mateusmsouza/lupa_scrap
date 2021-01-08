@@ -8,6 +8,7 @@ from bs4.element import Tag
 from api.get_pages import Requester
 from core.analyzer import Analyzer
 from utils.parser import Parser
+from utils.save import Saver 
 
 MONTHS = [
     {
@@ -66,24 +67,27 @@ class JournalScrap:
 
     def start_scrap(self):
         logging.info("starting scrapping on lupa")
-        #urls = self.__create_urls()
-        # for url in urls:
-        #     page = Requester().get_page(url)
-        #     logging.debug(page)
-        page = Requester().get_page("https://piaui.folha.uol.com.br/lupa/2020/12/page/3/")
-        soup = BeautifulSoup(page.text, 'html.parser')
-
-        news_div = soup.findAll("div", {"class": "internaPGN"})
-        
         soup_news = []
-        for news_preview in news_div[0]:
-            if isinstance(news_preview, Tag):
-                page = Requester().get_page(news_preview.a["href"])
-                soup_news.append(BeautifulSoup(page.text, 'html.parser'))
+        urls = self.__create_urls()
+        
+        for url in urls:
+            page = Requester().get_page(url)
+            logging.debug(page)
+
+            soup = BeautifulSoup(page.text, 'html.parser')
+
+            news_div = soup.findAll("div", {"class": "internaPGN"})
+            
+            
+            for news_preview in news_div[0]:
+                if isinstance(news_preview, Tag):
+                    page = Requester().get_page(news_preview.a["href"])
+                    soup_news.append(BeautifulSoup(page.text, 'html.parser'))
         
         # analyzing and parsing the data here
         news_analyzed = Analyzer().analyze_news(soup_news)
         news_analyzed = Parser().news(news_analyzed)
+        Saver().save(news_analyzed)
         
 
                 
