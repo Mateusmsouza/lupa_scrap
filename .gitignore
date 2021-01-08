@@ -137,3 +137,6 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 .vscode/settings.json
+
+# folder produced by the script
+/lupa_fake_news
